@@ -34,7 +34,11 @@ module Rl2
     end
     
     def subject_txt_url
-      "http://#{host}/#{bbs}/subject.txt"
+      "#{base_url}/subject.txt"
+    end
+    
+    def base_url
+      "http://#{host}/#{bbs}"
     end
   end
 end

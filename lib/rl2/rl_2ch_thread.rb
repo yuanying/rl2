@@ -1,3 +1,5 @@
+require 'rl2/base'
+
 module Rl2
   # 2ch のスレッドを表すクラス。
   class Rl2chThread
@@ -14,6 +16,14 @@ module Rl2
         @bbs = bbs
       end
       @key = key
+    end
+    
+    def dat_url
+      "#{self.bbs.base_url}/dat/#{self.key}.dat"
+    end
+    
+    def cached_dat_path
+      File.join( Rl2::Base.cache_dir, self.bbs.host, self.bbs.bbs, self.key + '.dat' )
     end
   end
 end
