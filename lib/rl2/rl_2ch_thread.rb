@@ -1,4 +1,7 @@
 require 'rl2/base'
+require 'rl2/rl_2ch_bbs'
+require 'uri'
+require 'net/http'
 
 module Rl2
   # 2ch のスレッドを表すクラス。
@@ -15,7 +18,21 @@ module Rl2
       else
         @bbs = bbs
       end
-      @key = key
+      @key = key.to_s
+    end
+    
+    def download_dat path
+      
+    end
+    
+    def download_dat_first_time path
+      Net::HTTP.version_1_2
+      open( path, 'w' ) do |cache|
+        uri = dat_uri
+        Net::HTTP.start( uri.host, uri.port ) do |http|
+          response = http.get( uri.path, { 'Accept-Encoding' => 'gzip' } )
+        end
+      end
     end
     
     def dat_url
@@ -23,7 +40,11 @@ module Rl2
     end
     
     def cached_dat_path
-      File.join( Rl2::Base.cache_dir, self.bbs.host, self.bbs.bbs, self.key + '.dat' )
+      thread_unique_path + '.dat'
+    end
+    
+    def thread_unique_path
+      File.join( Rl2::Base.cache_dir, self.bbs.host, self.bbs.bbs, self.key )
     end
   end
 end
