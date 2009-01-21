@@ -36,6 +36,10 @@ class Rl2::BBS::Base
     "#{base_url}/subject.txt"
   end
   
+  def index_url
+    "#{base_url}/"
+  end
+  
   def base_url
     "http://#{host}/#{bbs}"
   end
