@@ -1,37 +1,42 @@
+require 'rl2/thread'
 require 'rl2/base'
-require 'rl2/rl_2ch_bbs'
+require 'rl2/bbs/base'
 require 'uri'
 require 'net/http'
+require 'logger'
 
-module Rl2
+module Rl2::Thread
   # 2ch のスレッドを表すクラス。
-  class Rl2chThread
-    # RL2::Rl2chBbs のインスタンス
+  class Base
+    # RL2::BBS::Base のインスタンス
     attr_accessor :bbs
     # スレッドのキー
     attr_accessor :key
     
+    attr_reader :logger
+    
     # 板とスレッドのキーからインスタンスを生成する。
-    def initialize bbs, key
+    def initialize bbs, key, options={}
+      @logger = options[:logger] || Logger.new(STDOUT)
+      
       if bbs.kind_of?(String)
-        @bbs = Rl2chBbs.new(bbs)
+        @bbs = ::Rl2::BBS::Base.new(bbs)
       else
         @bbs = bbs
       end
       @key = key.to_s
     end
     
-    def download_dat path
-      
+    def download
+      d = Downloader.new( :logger => self.logger )
+      d.dat_download dat_url, cached_dat_path
     end
     
-    def download_dat_first_time path
-      Net::HTTP.version_1_2
-      open( path, 'w' ) do |cache|
-        uri = dat_uri
-        Net::HTTP.start( uri.host, uri.port ) do |http|
-          response = http.get( uri.path, { 'Accept-Encoding' => 'gzip' } )
-        end
+    # thread の内容をリストで返す。
+    def data
+      p = Parser.new( :logger => self.logger )
+      open( cached_dat_path ) do |io|
+        p.parse( io )
       end
     end
     
